@@ -25,59 +25,14 @@ const products = [
 
 let cart = {};
 
-// --- Helper for Storage ---
-function safeGetStorage(key) {
-    try {
-        return localStorage.getItem(key);
-    } catch (e) {
-        console.error('LocalStorage access denied', e);
-        return null;
-    }
-}
-
-function safeSetStorage(key, value) {
-    try {
-        localStorage.setItem(key, value);
-    } catch (e) {
-        console.error('LocalStorage write denied', e);
-    }
-}
-
-// --- Age Verification Logic ---
-function checkAgeVerification() {
-    const isVerified = safeGetStorage('ageVerified');
+// --- Simple Modal Logic (no validation) ---
+function continueApp() {
     const modal = document.getElementById('age-modal');
     const appContent = document.getElementById('app-content');
-
-    if (!modal || !appContent) return;
-
-    if (isVerified === 'true') {
-        modal.classList.add('hidden');
-        appContent.classList.remove('blur-content');
-    } else {
-        modal.classList.remove('hidden');
-        appContent.classList.add('blur-content');
-    }
-}
-
-function handleAdultClick() {
-    safeSetStorage('ageVerified', 'true');
-    const modal = document.getElementById('age-modal');
-    const appContent = document.getElementById('app-content');
-    
     if (modal) modal.classList.add('hidden');
     if (appContent) appContent.classList.remove('blur-content');
-    
     if (tg.HapticFeedback) {
         tg.HapticFeedback.notificationOccurred('success');
-    }
-}
-
-function handleMinorClick() {
-    if (tg.close) {
-        tg.close();
-    } else {
-        alert("Вам должно быть 18 лет для входа.");
     }
 }
 
@@ -195,13 +150,7 @@ if (tg.MainButton) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // Attach listeners safely
-    const btnAdult = document.getElementById('btn-adult');
-    const btnMinor = document.getElementById('btn-minor');
-
-    if (btnAdult) btnAdult.addEventListener('click', handleAdultClick);
-    if (btnMinor) btnMinor.addEventListener('click', handleMinorClick);
-
-    checkAgeVerification();
+    const btnContinue = document.getElementById('btn-continue');
+    if (btnContinue) btnContinue.addEventListener('click', continueApp);
     renderProducts();
 });
