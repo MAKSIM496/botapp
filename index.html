@@ -10,22 +10,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Age Verification Modal -->
-    <div id="age-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-icon">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <h2>Добро пожаловать</h2>
-            <p>Нажмите «Продолжить», чтобы открыть каталог.</p>
-            <div class="modal-buttons">
-                <button id="btn-continue" class="btn-primary">Продолжить</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main App Content (Hidden by default until verified) -->
-    <div id="app-content" class="app-container blur-content">
+    <div id="app-content" class="app-container">
         <header>
             <div class="header-content">
                 <h1>Магазин</h1>
@@ -34,11 +19,29 @@
         </header>
 
         <main>
-            <div id="products-grid" class="products-grid">
-                <!-- Products will be injected here -->
+            <div id="view-shop" class="view active">
+                <div id="products-grid" class="products-grid"></div>
+            </div>
+            <div id="view-cart" class="view">
+                <div class="cart-header">
+                    <div>Корзина</div>
+                    <div class="cart-total" id="cart-total">$0.00</div>
+                </div>
+                <div id="cart-list" class="cart-list"></div>
             </div>
         </main>
     </div>
+
+    <nav class="tabbar">
+        <button class="tab active" data-tab="shop">
+            <i class="fas fa-store"></i>
+            <span>Товары</span>
+        </button>
+        <button class="tab" data-tab="cart">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Корзина</span>
+        </button>
+    </nav>
 
     <script src="script.js"></script>
 </body>

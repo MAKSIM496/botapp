@@ -2,14 +2,10 @@
 const tg = window.Telegram?.WebApp || {};
 
 // Expand if available
-if (tg.expand) {
-    tg.expand();
-}
+if (tg.expand) { tg.expand(); }
 
 // Check for color scheme
-if (tg.colorScheme === 'dark') {
-    document.body.classList.add('dark-mode');
-}
+if (tg.colorScheme === 'dark') { document.body.classList.add('dark-mode'); }
 
 // Mock Data
 const products = [
@@ -26,14 +22,13 @@ const products = [
 let cart = {};
 
 // --- Simple Modal Logic (no validation) ---
-function continueApp() {
-    const modal = document.getElementById('age-modal');
-    const appContent = document.getElementById('app-content');
-    if (modal) modal.classList.add('hidden');
-    if (appContent) appContent.classList.remove('blur-content');
-    if (tg.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-    }
+function switchTab(tab) {
+    const shopView = document.getElementById('view-shop');
+    const cartView = document.getElementById('view-cart');
+    const tabs = document.querySelectorAll('.tabbar .tab');
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    if (shopView) shopView.classList.toggle('active', tab === 'shop');
+    if (cartView) cartView.classList.toggle('active', tab === 'cart');
 }
 
 // --- Product Logic ---
@@ -41,7 +36,6 @@ function continueApp() {
 function renderProducts() {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
-    
     grid.innerHTML = '';
 
     products.forEach((product, index) => {
@@ -49,7 +43,6 @@ function renderProducts() {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.style.animationDelay = `${index * 0.05}s`;
-        
         card.innerHTML = `
             <div class="product-image-placeholder">
                 <i class="fas ${product.icon} product-icon"></i>
@@ -94,6 +87,7 @@ window.updateCart = function(id, change) {
     }
 
     renderProducts();
+    renderCartView();
     updateMainButton();
     
     if (tg.HapticFeedback) {
@@ -117,7 +111,6 @@ function updateMainButton() {
         tg.MainButton.setText(`Оформить заказ (${totalItems} шт.) - $${totalPrice.toFixed(2)}`);
         tg.MainButton.show();
         tg.MainButton.enable();
-        // Set colors if supported
         if (tg.themeParams) {
              tg.MainButton.color = tg.themeParams.button_color || "#000000";
              tg.MainButton.textColor = tg.themeParams.button_text_color || "#ffffff";
@@ -148,9 +141,29 @@ if (tg.MainButton) {
     });
 }
 
-// Initialize
+function renderCartView() {
+    const list = document.getElementById('cart-list');
+    const totalEl = document.getElementById('cart-total');
+    if (!list || !totalEl) return;
+    list.innerHTML = '';
+    let total = 0;
+    Object.entries(cart).forEach(([id, qty]) => {
+        const p = products.find(prod => prod.id == id);
+        if (!p) return;
+        total += p.price * qty;
+        const item = document.createElement('div');
+        item.className = 'cart-item';
+        item.innerHTML = `<span class="cart-name">${p.name}</span><span class="cart-qty">x${qty}</span><span class="cart-price">$${(p.price*qty).toFixed(2)}</span>`;
+        list.appendChild(item);
+    });
+    totalEl.textContent = `$${total.toFixed(2)}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const btnContinue = document.getElementById('btn-continue');
-    if (btnContinue) btnContinue.addEventListener('click', continueApp);
     renderProducts();
+    renderCartView();
+    switchTab('shop');
+    document.querySelectorAll('.tabbar .tab').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
 });
